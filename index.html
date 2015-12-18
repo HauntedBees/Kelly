@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="http://code.jquery.com/jquery-2.0.3.min.js"></script>
+		<script src="http://cytoscape.github.io/cytoscape.js/api/cytoscape.js-latest/cytoscape.min.js"></script>
+		<script src="https://cdn.rawgit.com/cpettitt/dagre/v0.7.4/dist/dagre.min.js"></script>
+		<script src="https://cdn.rawgit.com/cytoscape/cytoscape.js-dagre/1.1.2/cytoscape-dagre.js"></script>
+		<script src="dialog.js"></script>
+		<link type='text/css' href='styles.css' rel='stylesheet'>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+		<title>WordSayer</title>
+	</head>
+	<body>
+		<div id="cy"></div>
+		<div id="editContainer">
+			<div id="fileRibbon" class="ribbon btn-group btn-group-xs">
+				<span class="option btn btn-default" id="newGraph">New File</span>
+				<span class="option btn btn-default" id="loadJSON">Load JSON File</span>
+				<span class="option btn btn-default" id="saveJSON">Save JSON File</span>
+			</div>
+			<br>
+			<div id="editRibbon" class="ribbon btn-group btn-group-sm">
+				<div class="option  btn btn-default" id="addNode">Add Node</div>
+			</div>
+			<div id="loadFileDiv" class="form-horizontal optionDiv">
+				<h4>Load JSON</h4>
+				<div class="form-group">
+					<label for="fileInput" class="col-sm-2 control-label">File</label>
+					<div class="col-sm-10 btn btn-default"><input type="file" id="fileinput"></div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-2 control-label"></div>
+					<div class="col-sm-10"><input type="button" id="btnLoad" class="btn btn-default" value="Load" onclick="LoadFile();"></div>
+				</div>
+			</div>
+			<div id="editNodeDiv" class="form-horizontal optionDiv">
+				<h4>Editing Node <button id="saveNode" class="btn btn-primary" type="button">Save</button></h4>
+				<input id="oldID" type="text">
+				<div class="form-group">
+					<label for="editID" class="col-sm-2 control-label">ID</label>
+					<div class="col-sm-10"><input id="editID" type="text" class="form-control saveable" placeholder="Required"></div>
+				</div>
+				<div class="form-group">
+					<label for="editSpeaker" class="col-sm-2 control-label">Speaker</label>
+					<div class="col-sm-10"><input id="editSpeaker" type="text" class="form-control saveable" placeholder="None"></div>
+				</div>
+				<div class="form-group">
+					<label for="editText" class="col-sm-2 control-label">Text</label>
+					<div class="col-sm-10"><textarea id="editText" class="form-control saveable" rows="3" placeholder="None"></textarea></div>
+				</div>
+				<div class="form-group">
+					<label for="editAction" class="col-sm-2 control-label">Action</label>
+					<div class="col-sm-10"><input id="editAction" type="text" class="form-control saveable" placeholder="Action to occur when this node is reached."></div>
+				</div>
+				<div class="form-group">
+					<label for="addSingle" class="col-sm-2 control-label">Next</label>
+					<div class="col-sm-10">
+						<span id="addButtons" class="nextOption">
+							<button id="addSingle" class="btn btn-default" type="button">Single Link</button>
+							<button id="addOptions" class="btn btn-default" type="button">Options</button>
+							<button id="addConditional" class="btn btn-default" type="button">Conditional</button>
+						</span>
+						<span id="editOptionVals" class="nextOption">
+							<div id="optionsTemplate">
+								<div class="form-group">
+									<label class="col-sm-4 control-label">Target</label>
+									<div class="col-sm-8"><input type="text" class="form-control saveable optionsTarget" placeholder="Required"></div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-4 control-label">Text</label>
+									<div class="col-sm-8"><input type="text" class="form-control saveable optionsMessage" placeholder="Required"></div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-4 control-label">Prerequisites</label>
+									<div class="col-sm-8"><input type="text" class="form-control saveable optionsCondition" placeholder="None"></div>
+								</div>
+							</div>
+						</span>
+						<span id="singleNext" class="nextOption">
+							<input type="text" id="singleTarget" class="form-control saveable" placeholder="Required">
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

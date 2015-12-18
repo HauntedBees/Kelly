@@ -1,0 +1,139 @@
+{
+	"nodes": [
+		{
+			"id": "I0001",
+			"data": {
+				"speaker": "Bob",
+				"message": "Hey kids",
+				"action": "x + 1"
+			},
+			"next": "I0002"
+		},
+		{
+			"id": "I0002",
+			"data": {
+				"message": "You wonder who Bob is talking to."
+			},
+			"next": {
+				"type": "options",
+				"data": [
+					{
+						"option": "\"What's up, Bob?\"",
+						"next": "I0003"
+					},
+					{				
+						"option": "\"Fuck you, Bob.\"",
+						"next": "I0004"
+					},
+					{
+						"option": "Drool on the carpet.",
+						"next": "I0006",
+						"prereq": "INT < 5"
+					}
+				]
+			}
+		},
+		{
+			"id": "I0003",
+			"data": {
+				"speaker": "Bob",
+				"message": "Oh, it's just you, %PLAYERNAME%. I got some biggu news."
+			},
+			"next": "I0005"
+		},
+		{
+			"id": "I0004",
+			"data": {
+				"speaker": "Bob",
+				"message": "Wow you're kind of an asshole. But anyway, I have some news."
+			},
+			"next": "I0005"
+		},
+		{
+			"id": "I0005",
+			"data": {
+				"speaker": "Bob",
+				"message": "But I'll tell you later. I need to smok wheed naow."
+			},
+			"next": {
+				"type": "conditional",
+				"random": false, 
+				"data": [
+					{
+						"condition": "IsNightTime()",
+						"next": "I0007"
+					},
+					{
+						"condition": "else",
+						"next": "I0008"
+					}
+				]
+			}
+		},
+		{
+			"id": "I0006",
+			"data": {
+				"speaker": "Bob",
+				"message": "Um. Okay. Maybe I'll come back later."
+			}
+		},
+		{
+			"id": "I0007",
+			"data": {
+				"message": "You look at the clock. It seems like it's a bit too late for there to be a 'later.'"
+			}
+		},
+		{
+			"id": "I0008",
+			"data": {
+				"message": "You sigh. Bob is a shithead."
+			}, 
+			"next": {
+				"type": "conditional",
+				"random": true,
+				"data": [
+					{"next": "I0009"}, 
+					{"next": "I0010"}
+				]
+			}
+		},
+		{
+			"id": "I0009",
+			"data": {
+				"message": "You wish he was dead."
+			}
+		},
+		{
+			"id": "I0010",
+			"data": {
+				"message": "You're glad he's not dead."
+			}, 
+			"next": {
+				"type": "conditional",
+				"random": true,
+				"data": [
+					{
+						"next": "I0011",
+						"weight": 0.6
+					}, 
+					{
+						"next": "I0012",
+						"weight": 0.4
+					}
+				]
+			}
+		},
+		{
+			"id": "I0011",
+			"data": {
+				"message": "lol psyche"
+			}
+		},
+		{
+			"id": "I0012",
+			"data": {
+				"message": "But you do wish he'd shut the hell up."
+			}
+		}
+	]
+}

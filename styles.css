@@ -1,0 +1,49 @@
+/*
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+#editContainer { 
+	padding-top: 5px;
+	display: block;
+	width: 37.5%;
+	min-height: 640px;
+}
+.ribbon { padding-left: 5px; padding-bottom: 5px; }
+#cy {
+	border: 1px solid black;
+	width: 62%;
+	height: 100%;
+	position: absolute;
+	right: 1px;
+	top: 0;
+	z-index: 999;
+}
+
+
+
+.optionDiv {
+	padding-top: 20px;
+	padding-left: 20%;
+	padding-right: 20%;
+	display: none;
+}
+#loadFileDiv { display: block; }
+#oldID { display: none; }
+
+#optionsTemplate { display: none; }
+.editOption {
+	background-color: #DDDDDD;
+	border: 1px solid #CCCCCC;
+	padding: 3px;
+	margin-bottom: 5px;
+}
