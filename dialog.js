@@ -256,7 +256,7 @@ function SaveNode(nodeId) {
 }
 function GetChildren(node, nodeId) { return node.neighborhood("edge[source='" + nodeId + "']"); }
 function DeleteChildren(node, nodeId) { GetChildren(node, nodeId).remove(); }
-function CreateLink(sourceId, targetId, prereq) {
+function CreateLink(sourceId, targetId, prereq, returnInsteadOfAdd) {
 	var edge = { 
 		data: { 
 			source: sourceId, 
@@ -267,7 +267,11 @@ function CreateLink(sourceId, targetId, prereq) {
 		edge.data.prereq = prereq;
 		edge.classes = "prereq";
 	}
-	cy.add(edge);
+	if(returnInsteadOfAdd === true) {
+		return edge;
+	} else {
+		cy.add(edge);
+	}
 }
 
 function ValidateSingleNext(node, nodeId) {	
@@ -292,25 +296,30 @@ function ValidateOptionsNext(node, nodeId) {
 }
 function CreateFirstTimeOptions(node, nodeId) {
 	var choiceId = "CHOICE_" + nodeId;
-	cy.add({data: {id: choiceId}, classes: "choice"});
-	//var position = {x: node.position("x"), y: node.position("y") + 50 };
 	var editOptions = $(".editOption"), i = 0;
+	var len = editOptions.length - 1;
+	var pos = {x: node.position("x") - (50 * len / 2), y: node.position("y") + 50 };
+	var elems = [];
+	elems.push({data: {id: choiceId}, classes: "choice", position: pos, width: 200 });
 	editOptions.each(function() {
 		var myId = nodeId + "_" + i++;
-		cy.add({
+		elems.push({
 			data: {
 				id: myId, 
 				parent: choiceId, 
 				msg: $(this).find(".optionsMessage").val()
 			},
-			classes: "choiceoption"
+			classes: "choiceoption", 
+			position: {x: pos.x + 50 * (i - 1), y: pos.y }
 		});
 		var prereq = $(this).find(".optionsCondition").val();
-		CreateLink(nodeId, myId, prereq);
+		elems.push(CreateLink(nodeId, myId, prereq, true));
 		var targetId = $(this).find(".optionsTarget").val();
 		var nextElem = cy.getElementById(targetId);
 		if(nextElem.length === 1) { CreateLink(myId, targetId); }
 	});
+	var bound = cy.$("[id^='" + nodeId + "_']").boundingBox();
+	cy.add(elems);
 	//cy.layout({name: "dagre"});
 }
 
