@@ -18,6 +18,7 @@
 ** SETUP **
 **********/
 var cy = null, nodeCount = 0;
+var inSelectMode = false, selectedElement = null;
 $(document).ready(function() {
 	InitCytoscape();
 	
@@ -37,6 +38,13 @@ $(document).ready(function() {
 		$("#saveNode").removeAttr("disabled").html("Save");
 	});
 	$("#addAdditionalOption").on("click", function() { CreateOptionForCurrentNode(); });
+	$(document).on("click", ".setTargetToNew", function() { $(this).closest(".input-group").find(".optionsTarget").val("*new*"); });
+	$(document).on("click", ".selectNodeToLink", function() {
+		inSelectMode = true;
+		selectedElement = $(this).closest(".input-group").find(".optionsTarget");
+		$("#cy").addClass("selecting");
+		$("#notification").show();
+	});
 });
 function InitCytoscape(elems) {
 	var padding = 5;
@@ -56,7 +64,9 @@ function InitCytoscape(elems) {
 					"padding-left": padding,
 					"padding-right": padding,
 					"padding-top": padding,
-					"padding-bottom": padding
+					"padding-bottom": padding,
+					"text-wrap": "wrap",
+					"text-max-width": 300
 				}
 			},
 			{
@@ -78,7 +88,6 @@ function InitCytoscape(elems) {
 			},
 			{ selector: ".noop", style: { "font-style": "italic" } }, 
 			{ selector: ".speaker", style: { "text-valign": "top" } }, 
-			{ selector: ".message", style: { "text-wrap": "wrap", "text-max-width": 300 } },
 			{ selector: ".choice", style: { "text-valign": "top", "background-color": "#AAAAAA" } }, 
 			{ selector: ".choiceoption", style: { "background-color": "#888888" } }, 
 			{ selector: ".prereq", style: { "label": "data(prereq)" } }, 
@@ -86,7 +95,18 @@ function InitCytoscape(elems) {
 		],
 		elements: elems
 	});
-	cy.on("tap", "node", function() { CleanUpMenu(); EditNode(this); return false; });
+	cy.on("tap", "node", function() { 
+		if(inSelectMode) {
+			inSelectMode = false;
+			selectedElement.val(this.data("id"));
+			$("#cy").removeClass("selecting");
+			$("#notification").hide();
+		} else {
+			CleanUpMenu();
+			EditNode(this);
+		}
+		return false;
+	});
 }
 function GetNodeID() { return $("#oldID").val(); }
 function GetChildLinks(node) { return node.neighborhood("edge[source='" + node.data("id") + "']"); }
@@ -424,8 +444,7 @@ function GetRegularNode(nodeId, nodeData) {
 			rawmsg: nodeData.message,
 			speaker: nodeData.speaker,
 			action: nodeData.action
-		}, 
-		classes: "message"
+		}
 	};
 	return res;
 }

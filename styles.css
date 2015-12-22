@@ -12,6 +12,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+.selecting { cursor: pointer; }
 #editContainer { 
 	padding-top: 5px;
 	display: block;
@@ -27,6 +28,13 @@
 	right: 1px;
 	top: 0;
 	z-index: 999;
+}
+#notification {
+	position: absolute;
+	right: 1px;
+	width: 62%;
+	padding: 4px 10px;
+	display: none;
 }
 
 
