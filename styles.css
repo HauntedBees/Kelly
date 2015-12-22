@@ -38,7 +38,7 @@
 	display: none;
 }
 #loadFileDiv { display: block; }
-#oldID { display: none; }
+.hiddenInfo { display: none; }
 
 #optionsTemplate { display: none; }
 .editOption {
@@ -47,3 +47,11 @@
 	padding: 3px;
 	margin-bottom: 5px;
 }
+
+.error {
+	font-style: italic;
+	color: #990000;
+}
+
+#addAdditionalOption { margin-bottom: 10px; }
+.removeOption { float: right; margin-right: 30px; }

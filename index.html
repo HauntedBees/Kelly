@@ -35,7 +35,8 @@
 			</div>
 			<div id="editNodeDiv" class="form-horizontal optionDiv">
 				<h4>Editing Node <button id="saveNode" class="btn btn-primary" type="button">Save</button></h4>
-				<input id="oldID" type="text">
+				<input id="oldID" class="hiddenInfo" type="text">
+				<input id="nextType" class="hiddenInfo" type="text">
 				<div class="form-group">
 					<label for="editID" class="col-sm-2 control-label">ID</label>
 					<div class="col-sm-10"><input id="editID" type="text" class="form-control saveable" placeholder="Required"></div>
@@ -71,10 +72,14 @@
 									<div class="col-sm-8"><input type="text" class="form-control saveable optionsMessage" placeholder="Required"></div>
 								</div>
 								<div class="form-group">
-									<label class="col-sm-4 control-label">Prerequisites</label>
+									<label class="col-sm-4 control-label">Prereqs.</label>
 									<div class="col-sm-8"><input type="text" class="form-control saveable optionsCondition" placeholder="None"></div>
 								</div>
+								<div class="form-group">
+									<button class="btn btn-danger removeOption" type="button">Remove</button>
+								</div>
 							</div>
+							<button id="addAdditionalOption" class="btn btn-default" type="button">Add More</button>
 						</span>
 						<span id="singleNext" class="nextOption">
 							<input type="text" id="singleTarget" class="form-control saveable" placeholder="Required">
