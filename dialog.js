@@ -32,7 +32,10 @@ $(document).ready(function() {
 	
 	$("#saveNode").on("click", function() { SaveNode(GetNodeID()); });
 	$(document).on("keydown", ".saveable", function() { $("#saveNode").removeAttr("disabled").html("Save"); });
-	$(document).on("click", ".removeOption", function() { $(this).closest(".editOption").remove(); });
+	$(document).on("click", ".removeOption", function() {
+		$(this).closest(".editOption").remove();
+		$("#saveNode").removeAttr("disabled").html("Save");
+	});
 	$("#addAdditionalOption").on("click", function() { CreateOptionForCurrentNode(); });
 });
 function InitCytoscape(elems) {
@@ -299,7 +302,7 @@ function CreateFirstTimeOptions(node, nodeId) {
 	var editOptions = $(".editOption"), i = 0;
 	var len = editOptions.length - 1;
 	var pos = {x: node.position("x") - (50 * len / 2), y: node.position("y") + 50 };
-	var elems = [];
+	var elems = [], outerEdges = [];
 	elems.push({data: {id: choiceId}, classes: "choice", position: pos, width: 200 });
 	editOptions.each(function() {
 		var myId = nodeId + "_" + i++;
@@ -315,11 +318,18 @@ function CreateFirstTimeOptions(node, nodeId) {
 		var prereq = $(this).find(".optionsCondition").val();
 		elems.push(CreateLink(nodeId, myId, prereq, true));
 		var targetId = $(this).find(".optionsTarget").val();
-		var nextElem = cy.getElementById(targetId);
-		if(nextElem.length === 1) { CreateLink(myId, targetId); }
+		if(targetId === "*new*") {
+			var newNode = CreateNode(false, {x: pos.x + 50 * (i - 1), y: pos.y + 50 });
+			var newNodeId = newNode.data("id");
+			$(this).find(".optionsTarget").val(newNodeId);
+			outerEdges.push({source: myId, target: newNodeId});
+		} else {
+			var nextElem = cy.getElementById(targetId);
+			if(nextElem.length === 1) { outerEdges.push({source: myId, target: targetId}); }
+		}
 	});
-	var bound = cy.$("[id^='" + nodeId + "_']").boundingBox();
 	cy.add(elems);
+	outerEdges.forEach(function(e) { CreateLink(e.source, e.target); });
 	//cy.layout({name: "dagre"});
 }
 
