@@ -43,7 +43,10 @@ function InitNodeOptions() {
 		$("#saveNode").removeAttr("disabled").html("Save");
 	});
 	$("#addAdditionalOption").on("click", function() { CreateOptionForCurrentNode(); });
-	$(document).on("click", ".setTargetToNew", function() { $(this).closest(".input-group").find(".optionsTarget").val("*new*"); });
+	$(document).on("click", ".setTargetToNew", function() {
+		$(this).closest(".input-group").find(".optionsTarget").val("*new*");
+		$("#saveNode").removeAttr("disabled").html("Save");
+	});
 	$(document).on("click", ".selectNodeToLink", function() {
 		inSelectMode = true;
 		selectedElement = $(this).closest(".input-group").find(".optionsTarget");
@@ -108,6 +111,7 @@ function InitCytoscape(elems) {
 			selectedElement.val(this.data("id"));
 			$("#cy").removeClass("selecting");
 			$("#notification").hide();
+			$("#saveNode").removeAttr("disabled").html("Save");
 		} else {
 			CleanUpMenu();
 			EditNode(this);
