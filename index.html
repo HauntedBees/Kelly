@@ -15,13 +15,14 @@
 		<div id="cy"></div>
 		<div id="editContainer">
 			<div id="fileRibbon" class="ribbon btn-group btn-group-xs">
-				<span class="option btn btn-default" id="newGraph">New File</span>
-				<span class="option btn btn-default" id="loadJSON">Load JSON File</span>
-				<span class="option btn btn-default" id="saveJSON">Save JSON File</span>
+				<div class="option btn btn-default" id="newGraph">New File</div>
+				<div class="option btn btn-default" id="loadJSON">Load JSON File</div>
+				<div class="option btn btn-default" id="saveJSON">Save JSON File</div>
+				<div class="option btn btn-default" id="refreshLayout">Refresh Layout</div>
 			</div>
 			<br>
 			<div id="editRibbon" class="ribbon btn-group btn-group-sm">
-				<div class="option  btn btn-default" id="addNode">Add Node</div>
+				<div class="option btn btn-default" id="addNode">Add Node</div>
 			</div>
 			<div id="loadFileDiv" class="form-horizontal optionDiv">
 				<h4>Load JSON</h4>
@@ -62,6 +63,24 @@
 							<button id="addOptions" class="btn btn-default" type="button">Options</button>
 							<button id="addConditional" class="btn btn-default" type="button">Conditional</button>
 						</span>
+						<span id="editSingleVal" class="nextOption">
+							<div class="form-group">
+								<label class="col-sm-4 control-label">Target</label>
+								<div class="col-sm-8">
+									<div class="input-group">
+										<input type="text" id="singleTarget" class="form-control saveable optionsTarget" placeholder="ID">
+										<span class="input-group-btn">
+											<button class="btn btn-info selectNodeToLink" type="button">
+												<span class="glyphicon glyphicon-link"></span>
+											</button>
+											<button class="btn btn-success setTargetToNew" type="button">
+												<span class="glyphicon glyphicon-plus"></span>
+											</button>
+										</span>
+									</div>
+								</div>
+							</div>
+						</span>
 						<span id="editOptionVals" class="nextOption">
 							<div id="optionsTemplate">
 								<div class="form-group">
@@ -93,9 +112,6 @@
 								</div>
 							</div>
 							<button id="addAdditionalOption" class="btn btn-default" type="button">Add More</button>
-						</span>
-						<span id="singleNext" class="nextOption">
-							<input type="text" id="singleTarget" class="form-control saveable" placeholder="Required">
 						</span>
 					</div>
 				</div>

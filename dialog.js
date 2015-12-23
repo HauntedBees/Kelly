@@ -21,19 +21,24 @@ var cy = null, nodeCount = 0;
 var inSelectMode = false, selectedElement = null;
 $(document).ready(function() {
 	InitCytoscape();
-	
+	InitTopMenu();
+	InitNodeOptions();
+});
+function InitTopMenu() {	
 	$("#newGraph").on("click", function() { if(confirm("Any unsaved changes will be lost. Continue?")) { cy.load(); } });
 	$("#loadJSON").on("click", function() { CleanUpMenu(); $("#loadFileDiv").show(); });
 	$("#saveJSON").on("click", function() { SaveJSON(); });
-	
+	$("#refreshLayout").on("click", function() { cy.layout({name: "dagre"}); });
+}
+function InitNodeOptions() {
 	$("#addNode").on("click", function() { CleanUpMenu(); CreateNode(true); });
-	
-	$("#addSingle").on("click", function() { SetNextToSingle(GetNodeID(), true); });
+	$("#addSingle").on("click", function() { SetNextToSingle(); });
 	$("#addOptions").on("click", function() { SetNextToOptions(); });
 	
 	$("#saveNode").on("click", function() { SaveNode(GetNodeID()); });
 	$(document).on("keydown", ".saveable", function() { $("#saveNode").removeAttr("disabled").html("Save"); });
 	$(document).on("click", ".removeOption", function() {
+		if($(".editOption").length == 2) { alert("You must have at least 2 options for a choice field."); return; }
 		$(this).closest(".editOption").remove();
 		$("#saveNode").removeAttr("disabled").html("Save");
 	});
@@ -45,7 +50,9 @@ $(document).ready(function() {
 		$("#cy").addClass("selecting");
 		$("#notification").show();
 	});
-});
+}
+
+
 function InitCytoscape(elems) {
 	var padding = 5;
 	cy = cytoscape({
@@ -111,9 +118,6 @@ function InitCytoscape(elems) {
 function GetNodeID() { return $("#oldID").val(); }
 function GetChildLinks(node) { return node.neighborhood("edge[source='" + node.data("id") + "']"); }
 function StringOrUndefined(s) { if(s==="") { return undefined; } return s; } // wrap me around non-mandatory values in JSON export to prevent empty strings from showing up
-
-
-
 
 
 
@@ -233,16 +237,16 @@ function CleanUpMenu() {
 	$(".has-error").removeClass("has-error");
 	$(".error").remove();
 }
-function SetNextToSingle(nodeId, save) {
-	if(save) { SaveNode(nodeId); }
-	var oldNode = cy.getElementById(nodeId);
-	var newNode = CreateNode(true, {x: oldNode.position("x"), y: oldNode.position("y") + 50 });
-	cy.add({ data: { source: nodeId, target: newNode.data("id") } });
+function SetNextToSingle() {
+	$("#nextType").val("single");
+	$("#addButtons").hide();
+	$("#editSingleVal").show();
 }
 function SetNextToOptions() {
 	$("#nextType").val("option");
 	$("#addButtons").hide();
 	$("#editOptionVals").show();
+	CreateOptionForCurrentNode();
 	CreateOptionForCurrentNode();
 }
 function CreateOptionForCurrentNode() { $("#editOptionVals").append(GetOptionChoice()); }
@@ -253,11 +257,6 @@ function SaveNode(nodeId) {
 	
 	var nextType = $("#nextType").val();
 	if(nextType == "single") {
-		if($("#singleTarget").val() === "") { 
-			$("#nextType").val("");
-			SaveNode(nodeId);
-			return;
-		}
 		if(!ValidateSingleNext(node, nodeId)) { return; }
 	} else if(nextType == "option") {
 		if(!ValidateOptionsNext(node, nodeId)) { return; }
@@ -299,10 +298,19 @@ function CreateLink(sourceId, targetId, prereq, returnInsteadOfAdd) {
 
 function ValidateSingleNext(node, nodeId) {	
 	var nextId = $("#singleTarget").val();
+	if(nextId === "") {
+		DeleteChildren(node, nodeId);
+		return true;
+	}
+	if(nextId === "*new*") {
+		var newNode = CreateNode(false, {x: node.position("x"), y: node.position("y") + 50 });
+		nextId = newNode.data("id");
+		$("#singleTarget").val(nextId);
+	}
 	var nextElem = cy.getElementById(nextId);
 	if(nextElem.length === 0) {
-		$("#singleTarget").parent().addClass("has-error").append("<div class='error'>Please enter a valid ID.</div>");
-		return false;
+		$("#singleTarget").val("");
+		return ValidateSingleNext(node, nodeId);
 	}
 	DeleteChildren(node, nodeId);
 	CreateLink(nodeId, nextId);
@@ -350,7 +358,6 @@ function CreateFirstTimeOptions(node, nodeId) {
 	});
 	cy.add(elems);
 	outerEdges.forEach(function(e) { CreateLink(e.source, e.target); });
-	//cy.layout({name: "dagre"});
 }
 
 
@@ -429,9 +436,9 @@ function EditNode(node) {
 			});*/
 		}
 	} else if(children.length == 1) {
-		$("#singleNext").show();
+		$("#editSingleVal").show();
 		$("#nextType").val("single");
-		$("#singleTarget").val(children.first().data("target"));
+		$("#editSingleVal").find(".optionsTarget").val(children.first().data("target"));
 	} else {
 		$("#addButtons").show();
 	}
