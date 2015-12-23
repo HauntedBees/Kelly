@@ -253,6 +253,7 @@ function CleanUpMenu() {
 	$("#nextType").val("");
 	$(".optionDiv").hide();
 	$(".editOption").remove();
+	$(".editCondition").remove();
 	$(".has-error").removeClass("has-error");
 	$(".error").remove();
 }
