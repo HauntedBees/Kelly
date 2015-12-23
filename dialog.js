@@ -61,6 +61,7 @@ function InitNodeOptions() {
 		$("#notification").show();
 	});
 	$("#resetNext").on("click", function() { ResetNext(); });
+	$("#deleteNode").on("click", function() { DeleteNode(); });
 }
 function InitCytoscape(elems) {
 	var padding = 5;
@@ -291,6 +292,16 @@ function ResetNext() {
 	$(".nextOption").hide();
 	$("#addButtons").show();
 	$("#nextType").val("");
+}
+function DeleteNode() {
+	var nodeId = GetNodeID();
+	var node = cy.getElementById(nodeId);
+	if($("#nextType").val() == "option") {
+		cy.$("[id^='" + nodeId + "_']").remove();
+		cy.$("#CHOICE_" + nodeId).remove();
+	}
+	node.remove();
+	CleanUpMenu();
 }
 
 function CreateOptionForCurrentNode() { $("#addAdditionalOption").before(GetOptionChoice()); }
