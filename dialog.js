@@ -26,6 +26,7 @@ function InitTopMenu() {
 	$("#newGraph").on("click", function() { if(confirm("Any unsaved changes will be lost. Continue?")) { cy.load(); } });
 	$("#loadJSON").on("click", function() { CleanUpMenu(); $("#loadFileDiv").show(); });
 	$("#saveJSON").on("click", function() { SaveJSON(); });
+	$("#saveXML").on("click", function() { SaveXML(); });
 	$("#refreshLayout").on("click", function() { cy.layout({name: "dagre"}); });
 }
 function InitNodeOptions() {
@@ -199,7 +200,7 @@ function AddNonrandomConditionals(elems, nodeId, nextdata) {
 		elems.edges.push({data: {source: nodeId, target: nn.next, prereq: nn.condition}, classes: "prereq"});
 	}
 }
-function SaveJSON() {
+function SaveJSON(returnString) {
 	var nodes = [];
 	cy.$("node").each(function() {
 	if(this.hasClass("choice") || this.hasClass("choiceoption")) { return; }
@@ -257,9 +258,70 @@ function SaveJSON() {
 		}
 		nodes.push(data);
 	});
-	var url = "data:text/json;charset=utf8," + encodeURIComponent(JSON.stringify({ "nodes": nodes }));
-	window.open(url, '_blank');
-	window.focus();
+	if(returnString) { return nodes; }
+	var element = document.createElement("a");
+	element.setAttribute("href", "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ "nodes": nodes })));
+	element.setAttribute("download", prompt("Specify a filename.") + ".json");
+	element.style.display = "none";
+	document.body.appendChild(element);
+	element.click();
+	document.body.removeChild(element);
+}
+function SaveXML() {
+	var nodes = SaveJSON(true);
+	var xml = "<nodes>";
+	nodes.forEach(function(node) { xml += NodeToXML(node); });
+	xml += "</nodes>";
+	var element = document.createElement("a");
+	element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(xml));
+	element.setAttribute("download", prompt("Specify a filename.") + ".xml");
+	element.style.display = "none";
+	document.body.appendChild(element);
+	element.click();
+	document.body.removeChild(element);
+}
+function NodeToXML(node) {
+	var xml = "<node id=\"" + CleanXML(node.id, true) + "\">";
+	var data = node.data;
+	if(data.speaker !== undefined) { xml += "<speaker>" + CleanXML(data.speaker) + "</speaker>"; }
+	if(data.message !== undefined) { xml += "<message>" + CleanXML(data.message) + "</message>"; }
+	if(data.action !== undefined) { xml += "<action>" + CleanXML(data.action) + "</action>"; }
+	if(node.next !== undefined) {
+		xml += "<next";
+		if(node.next.condition !== undefined) { xml += " condition=\"" + CleanXML(node.next.condition, true) + "\""; }
+		xml += ">";
+		if(node.next instanceof Object) {
+			if(node.next.type === "options") { // user choice
+				node.next.data.forEach(function(nextElem) {
+					xml += "<option";
+					if(nextElem.prereq !== undefined) { xml += " prereq=\"" + CleanXML(nextElem.prereq, true) + "\""; }
+					xml += "><node>" + CleanXML(nextElem.next) + "</node><text>" + CleanXML(nextElem.option) + "</text></option>";
+				});
+			} else if(node.next.type === "conditional") { // next option is based on game logic
+				if(node.next.condition === "random") {
+					node.next.data.forEach(function(nextElem) {
+						xml += "<conditional><node>" + CleanXML(nextElem.next) + "</node>";
+						if(nextElem.weight !== undefined) { xml += "<weight>" + CleanXML(nextElem.weight) + "</weight>"; }
+						xml += "</conditional>";
+					});
+				} else {
+					node.next.data.forEach(function(nextElem) {
+						xml += "<conditional><node>" + CleanXML(nextElem.next) + "</node><condition>" + CleanXML(nextElem.condition) + "</condition></conditional>";
+					});
+				}
+			}
+		} else { // only one option
+			xml += "<node>" + CleanXML(node.next) + "</node>";
+		}
+		xml += "</next>";
+	}
+	xml += "</node>";
+	return xml;
+}
+function CleanXML(s, attr) {
+	var res = s.replace(/</, "&lt;").replace(/>/, "&gt;");
+	if(attr) { res = res.replace(/"/, "\\\""); }
+	return res;
 }
 
 /*****************
