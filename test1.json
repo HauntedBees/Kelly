@@ -57,7 +57,6 @@
 			},
 			"next": {
 				"type": "conditional",
-				"random": false, 
 				"data": [
 					{
 						"condition": "IsNightTime()",
@@ -90,7 +89,7 @@
 			}, 
 			"next": {
 				"type": "conditional",
-				"random": true,
+				"condition": "random",
 				"data": [
 					{"next": "I0009"}, 
 					{"next": "I0010"}
@@ -110,7 +109,7 @@
 			}, 
 			"next": {
 				"type": "conditional",
-				"random": true,
+				"condition": "random",
 				"data": [
 					{
 						"next": "I0011",

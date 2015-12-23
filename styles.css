@@ -41,15 +41,15 @@
 
 .optionDiv {
 	padding-top: 20px;
-	padding-left: 20%;
-	padding-right: 20%;
+	padding-left: 15%;
+	padding-right: 15%;
 	display: none;
 }
 #loadFileDiv { display: block; }
 .hiddenInfo { display: none; }
 
-#optionsTemplate { display: none; }
-.editOption {
+#optionsTemplate, #conditionalTemplate { display: none; }
+.editOption, .editCondition {
 	background-color: #DDDDDD;
 	border: 1px solid #CCCCCC;
 	padding: 3px;
@@ -62,4 +62,5 @@
 }
 
 #addAdditionalOption { margin-bottom: 10px; }
-.removeOption { float: right; margin-right: 30px; }
+
+.close-group { margin-bottom: 0 !important; }

@@ -34,6 +34,7 @@ function InitNodeOptions() {
 	$("#addNode").on("click", function() { CleanUpMenu(); CreateNode(true); });
 	$("#addSingle").on("click", function() { SetNextToSingle(); });
 	$("#addOptions").on("click", function() { SetNextToOptions(); });
+	$("#addConditional").on("click", function() { SetNextToConditional(); });
 	
 	$("#saveNode").on("click", function() { SaveNode(GetNodeID()); });
 	$(document).on("keydown", ".saveable", function() { $("#saveNode").removeAttr("disabled").html("Save"); });
@@ -42,7 +43,13 @@ function InitNodeOptions() {
 		$(this).closest(".editOption").remove();
 		$("#saveNode").removeAttr("disabled").html("Save");
 	});
+	$(document).on("click", ".removeCondition", function() {
+		if($(".editCondition").length == 2) { alert("You must have at least 2 options for a condition field."); return; }
+		$(this).closest(".editCondition").remove();
+		$("#saveNode").removeAttr("disabled").html("Save");
+	});
 	$("#addAdditionalOption").on("click", function() { CreateOptionForCurrentNode(); });
+	$("#addAdditionalCondition").on("click", function() { CreateConditionForCurrentNode(); });
 	$(document).on("click", ".setTargetToNew", function() {
 		$(this).closest(".input-group").find(".optionsTarget").val("*new*");
 		$("#saveNode").removeAttr("disabled").html("Save");
@@ -54,8 +61,6 @@ function InitNodeOptions() {
 		$("#notification").show();
 	});
 }
-
-
 function InitCytoscape(elems) {
 	var padding = 5;
 	cy = cytoscape({
@@ -100,8 +105,7 @@ function InitCytoscape(elems) {
 			{ selector: ".speaker", style: { "text-valign": "top" } }, 
 			{ selector: ".choice", style: { "text-valign": "top", "background-color": "#AAAAAA" } }, 
 			{ selector: ".choiceoption", style: { "background-color": "#888888" } }, 
-			{ selector: ".prereq", style: { "label": "data(prereq)" } }, 
-			{ selector: ".randweight", style: { "label": "data(display)" } }
+			{ selector: ".prereq", style: { "label": "data(prereq)" } }
 		],
 		elements: elems
 	});
@@ -125,6 +129,8 @@ function StringOrUndefined(s) { if(s==="") { return undefined; } return s; } // 
 
 
 
+
+
 /***********************
 ** JSON Import/Export **
 ***********************/
@@ -144,17 +150,19 @@ function DisplayFromFile(data) { // data is JSON, ID cannot be a decimal number
 	var nodesJSON = data.nodes;
 	var elems = {nodes: [], edges: []};
 	nodesJSON.forEach(function(node) {
+		var newNode = null;
 		if(node.data !== undefined) {
-			elems.nodes.push(GetRegularNode(node.id, node.data));
+			newNode = GetRegularNode(node.id, node.data);
 		} else {
-			elem.nodes.push({data: {id: node.id, msg: "empty"}, classes: "noop"});
+			newNode = {data: {id: node.id, msg: "empty"}, classes: "noop"};
 		}
 		if(node.next !== undefined) {
 			if(node.next instanceof Object) {
 				if(node.next.type === "options") { // user choice
 					AddOptions(elems, node.id, node.next.data);
 				} else if(node.next.type === "conditional") { // next option is based on game logic
-					if(node.next.random) {
+					if(node.next.condition === "random") {
+						newNode.data.condition = "random";
 						AddRandomConditionals(elems, node.id, node.next.data);
 					} else {
 						AddNonrandomConditionals(elems, node.id, node.next.data);
@@ -164,6 +172,7 @@ function DisplayFromFile(data) { // data is JSON, ID cannot be a decimal number
 				elems.edges.push({data: {source: node.id, target: node.next}});
 			}
 		}
+		elems.nodes.push(newNode);
 	});
 	InitCytoscape(elems);
 }
@@ -199,21 +208,25 @@ function SaveJSON() {
 					next.data.push(nextInfo);
 				});
 			} else {
-				var isRandom = children.first().data("prereq") === "random";
-				console.log(isRandom);
-				next.random = isRandom;
+				next.condition = StringOrUndefined(this.data("condition"));
+				var isRandom = next.condition === "random";
+				var node = this;
+				var allSameRandom = isRandom, currRand = undefined;
 				children.each(function() {
 					var nextId = this.data("target");
 					var nextNode = cy.getElementById(nextId);
-					var nextNodeEdge = nextNode.neighborhood("edge[source='" + nextId + "']");
+					var betweenEdgeReq = node.edgesTo(nextNode).data("prereq");
 					var nextInfo = { next: nextId };
 					if(isRandom) {
-						nextInfo.weight = StringOrUndefined(this.data("weight"));
+						nextInfo.weight = StringOrUndefined(betweenEdgeReq.replace(/^random \((0\.\d+)\)$/, "$1"));
+						currRand = currRand || nextInfo.weight;
+						if(nextInfo.weight !== currRand) { allSameRandom = false; }
 					} else {
-						nextInfo.condition = this.data("prereq");
+						nextInfo.condition = betweenEdgeReq;
 					}
 					next.data.push(nextInfo);
 				});
+				if(allSameRandom) { next.data.forEach(function(elem) { elem.weight = undefined; }); }
 			}
 			data.next = next;
 		} else if(children.length == 1) {
@@ -253,17 +266,28 @@ function SetNextToOptions() {
 	CreateOptionForCurrentNode();
 	CreateOptionForCurrentNode();
 }
-function CreateOptionForCurrentNode() { $("#editOptionVals").append(GetOptionChoice()); }
+function SetNextToConditional() {
+	$("#nextType").val("conditional");
+	$("#addButtons").hide();
+	$("#editConditionalVals").show();
+	CreateConditionForCurrentNode();
+	CreateConditionForCurrentNode();
+}
 
+function CreateOptionForCurrentNode() { $("#addAdditionalOption").before(GetOptionChoice()); }
+function CreateConditionForCurrentNode() { $("#addAdditionalCondition").before(GetConditionChoice()); }
 
 function SaveNode(nodeId) {
 	var node = cy.getElementById(nodeId);
 	
 	var nextType = $("#nextType").val();
-	if(nextType == "single") {
+	if(nextType === "single") {
 		if(!ValidateSingleNext(node, nodeId)) { return; }
-	} else if(nextType == "option") {
+	} else if(nextType === "option") {
 		if(!ValidateOptionsNext(node, nodeId)) { return; }
+	} else if(nextType === "conditional") {
+		if(!ValidateConditionalNext(node, nodeId)) { return; }
+		node.data("condition", $("#fullCondition").val());
 	}
 	
 	node.data("id", $("#editID").val());
@@ -300,7 +324,7 @@ function CreateLink(sourceId, targetId, prereq, returnInsteadOfAdd) {
 	}
 }
 
-function ValidateSingleNext(node, nodeId) {	
+function ValidateSingleNext(node, nodeId) {
 	var nextId = $("#singleTarget").val();
 	if(nextId === "") {
 		DeleteChildren(node, nodeId);
@@ -364,11 +388,32 @@ function CreateFirstTimeOptions(node, nodeId) {
 	outerEdges.forEach(function(e) { CreateLink(e.source, e.target); });
 }
 
+function ValidateConditionalNext(node, nodeId) {
+	GetChildren(node, nodeId).remove();
+	var editConditions = $(".editCondition"), i = 0;
+	var fullCondition = $("#fullCondition").val();
+	var isRandom = fullCondition === "random";
+	var avgWeight = isRandom ? ("random (" + (1 / (editConditions.length)).toString().substr(0, 5) + ")") : undefined;
+	var pos = {x: node.position("x") - (50 * ((editConditions.length - 1) / 2)), y: node.position("y") + 50 };
+	editConditions.each(function() {
+		var targetId = $(this).find(".optionsTarget").val();
+		var cond = $(this).find(".optionsCondition").val();
+		if(isRandom) { cond = cond === "" ? avgWeight : "random (" + cond + ")"; }
+		if(targetId === "*new*") {
+			var newNode = CreateNode(false, {x: pos.x + 50 * i++, y: pos.y + 50 });
+			var newNodeId = newNode.data("id");
+			$(this).find(".optionsTarget").val(newNodeId);
+			CreateLink(nodeId, newNodeId, cond);
+		} else {
+			var nextElem = cy.getElementById(targetId);
+			if(nextElem.length === 1) { CreateLink(nodeId, targetId, cond); }
+		}
+	});
+	return true;
+}
 
-/*****************
-** Data Getters **
-*****************/
 function GetOptionChoice() { return $("#optionsTemplate").clone().attr("id", "").addClass("editOption"); }
+function GetConditionChoice() { return $("#conditionalTemplate").clone().attr("id", "").addClass("editCondition"); }
 
 
 /*****************
@@ -407,10 +452,10 @@ function EditNode(node) {
 	var children = GetChildLinks(node);
 	$(".nextOption").hide();
 	if(children.length > 1) {
-		$("#editOptionVals").show();
-		$(".editOption").remove();
 		var isOption = cy.getElementById(children.first().data("target")).data("parent") !== undefined;
 		if(isOption) {
+			$("#editOptionVals").show();
+			$(".editOption").remove();
 			$("#nextType").val("option");
 			children.each(function() {
 				var nextId = this.data("target");
@@ -420,24 +465,28 @@ function EditNode(node) {
 				clone.find(".optionsTarget").val(nextNodeEdge.data("target"));
 				clone.find(".optionsMessage").val(nextNode.data("msg"));
 				clone.find(".optionsCondition").val(this.data("prereq"));
-				$("#editOptionVals").append(clone);
+				$("#addAdditionalOption").before(clone);
 			});
 		} else {
-			/*var isRandom = children.first().data("prereq") === "random";
-			console.log(isRandom);
-			next.random = isRandom;
+			$("#editConditionalVals").show();
+			$(".editCondition").remove();
+			$("#nextType").val("conditional");
+			$("#fullCondition").val(node.data("condition"));
+			var allSameRandom = true, currRand = undefined;
 			children.each(function() {
 				var nextId = this.data("target");
 				var nextNode = cy.getElementById(nextId);
 				var nextNodeEdge = nextNode.neighborhood("edge[source='" + nextId + "']");
-				var nextInfo = { next: nextId };
-				if(isRandom) {
-					nextInfo.weight = this.data("weight");
-				} else {
-					nextInfo.condition = this.data("prereq");
-				}
-				next.data.push(nextInfo);
-			});*/
+				var clone = GetConditionChoice();
+				clone.find(".optionsTarget").val(nextId);
+				var prereq = this.data("prereq");
+				if(/^random \(0\.\d+\)$/.test(prereq)) { prereq = prereq.replace(/^random \((0\.\d+)\)$/, "$1"); }
+				currRand = currRand || prereq;
+				if(prereq !== currRand) { allSameRandom = false; }
+				clone.find(".optionsCondition").val(prereq);
+				$("#addAdditionalCondition").before(clone);
+			});
+			if(allSameRandom) { $(".optionsCondition").val(""); }
 		}
 	} else if(children.length == 1) {
 		$("#editSingleVal").show();
@@ -483,7 +532,7 @@ function AddRandomConditionals(elems, nodeId, nextdata) {
 	var count = (1 / nextdata.length).toPrecision(1);
 	for(var i = 0; i < nextdata.length; i++) {
 		var nn = nextdata[i];
-		elems.edges.push({data: {source: nodeId, target: nn.next, prereq: "random", weight: nn.weight, display: "random (" + (nn.weight || count) + ")"}, classes: "randweight"});
+		elems.edges.push({data: {source: nodeId, target: nn.next, weight: nn.weight, prereq: "random (" + (nn.weight || count) + ")"}, classes: "prereq"});
 	}
 }
 function AddNonrandomConditionals(elems, nodeId, nextdata) {
