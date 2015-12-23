@@ -12,8 +12,6 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-
 /**********
 ** SETUP **
 **********/
@@ -127,11 +125,7 @@ function InitCytoscape(elems) {
 }
 function GetNodeID() { return $("#oldID").val(); }
 function GetChildLinks(node) { return node.neighborhood("edge[source='" + node.data("id") + "']"); }
-function StringOrUndefined(s) { if(s==="") { return undefined; } return s; } // wrap me around non-mandatory values in JSON export to prevent empty strings from showing up
-
-
-
-
+function StringOrUndefined(s) { if(s==="") { return undefined; } return s; }
 
 /***********************
 ** JSON Import/Export **
@@ -177,6 +171,33 @@ function DisplayFromFile(data) { // data is JSON, ID cannot be a decimal number
 		elems.nodes.push(newNode);
 	});
 	InitCytoscape(elems);
+}
+function AddOptions(elems, nodeId, nextdata) {
+	var choiceid = "CHOICE_" + nodeId;
+	elems.nodes.push({data: {id: choiceid}, classes: "choice"});
+	for(var i = 0; i < nextdata.length; i++) {
+		var nn = nextdata[i], myid = nodeId + "_" + i;
+		if(nn.prereq !== undefined) {
+			elems.edges.push({data: {source: nodeId, target: myid, prereq: nn.prereq}, classes: "prereq"});
+		} else {
+			elems.edges.push({data: {source: nodeId, target: myid}});
+		}
+		elems.nodes.push({data: {id: myid, parent: choiceid, msg: nn.option }, classes: "choiceoption"});
+		elems.edges.push({data: {source: myid, target: nn.next}});
+	}
+}
+function AddRandomConditionals(elems, nodeId, nextdata) {
+	var count = (1 / nextdata.length).toPrecision(1);
+	for(var i = 0; i < nextdata.length; i++) {
+		var nn = nextdata[i];
+		elems.edges.push({data: {source: nodeId, target: nn.next, weight: nn.weight, prereq: "random (" + (nn.weight || count) + ")"}, classes: "prereq"});
+	}
+}
+function AddNonrandomConditionals(elems, nodeId, nextdata) {
+	for(var i = 0; i < nextdata.length; i++) {
+		var nn = nextdata[i];
+		elems.edges.push({data: {source: nodeId, target: nn.next, prereq: nn.condition}, classes: "prereq"});
+	}
 }
 function SaveJSON() {
 	var nodes = [];
@@ -241,11 +262,6 @@ function SaveJSON() {
 	window.focus();
 }
 
-
-
-
-
-
 /*****************
 ** Editor Setup **
 *****************/
@@ -304,13 +320,10 @@ function DeleteNode() {
 	node.remove();
 	CleanUpMenu();
 }
-
 function CreateOptionForCurrentNode() { $("#addAdditionalOption").before(GetOptionChoice()); }
 function CreateConditionForCurrentNode() { $("#addAdditionalCondition").before(GetConditionChoice()); }
-
 function SaveNode(nodeId) {
-	var node = cy.getElementById(nodeId);
-	
+	var node = cy.getElementById(nodeId);	
 	var nextType = $("#nextType").val();
 	if(nextType === "single") {
 		if(!ValidateSingleNext(node, nodeId)) { return; }
@@ -320,7 +333,6 @@ function SaveNode(nodeId) {
 		if(!ValidateConditionalNext(node, nodeId)) { return; }
 		node.data("condition", $("#fullCondition").val());
 	}
-	
 	node.data("id", $("#editID").val());
 	node.data("speaker", $("#editSpeaker").val());
 	node.data("rawmsg", $("#editText").val());
@@ -418,7 +430,6 @@ function CreateFirstTimeOptions(node, nodeId) {
 	cy.add(elems);
 	outerEdges.forEach(function(e) { CreateLink(e.source, e.target); });
 }
-
 function ValidateConditionalNext(node, nodeId) {
 	GetChildren(node, nodeId).remove();
 	var editConditions = $(".editCondition"), i = 0;
@@ -442,10 +453,8 @@ function ValidateConditionalNext(node, nodeId) {
 	});
 	return true;
 }
-
 function GetOptionChoice() { return $("#optionsTemplate").clone().attr("id", "").addClass("editOption"); }
 function GetConditionChoice() { return $("#conditionalTemplate").clone().attr("id", "").addClass("editCondition"); }
-
 
 /*****************
 ** Node Editing **
@@ -547,31 +556,4 @@ function GetMessage(speaker, message, action) {
 	if(speaker !== undefined && speaker !== "") { res = speaker + ": " + res; }
 	if(action !== undefined && action !== "") { res += "\n\n(" + action + ")"; }
 	return res;
-}
-function AddOptions(elems, nodeId, nextdata) {
-	var choiceid = "CHOICE_" + nodeId;
-	elems.nodes.push({data: {id: choiceid}, classes: "choice"});
-	for(var i = 0; i < nextdata.length; i++) {
-		var nn = nextdata[i], myid = nodeId + "_" + i;
-		if(nn.prereq !== undefined) {
-			elems.edges.push({data: {source: nodeId, target: myid, prereq: nn.prereq}, classes: "prereq"});
-		} else {
-			elems.edges.push({data: {source: nodeId, target: myid}});
-		}
-		elems.nodes.push({data: {id: myid, parent: choiceid, msg: nn.option }, classes: "choiceoption"});
-		elems.edges.push({data: {source: myid, target: nn.next}});
-	}
-}
-function AddRandomConditionals(elems, nodeId, nextdata) {
-	var count = (1 / nextdata.length).toPrecision(1);
-	for(var i = 0; i < nextdata.length; i++) {
-		var nn = nextdata[i];
-		elems.edges.push({data: {source: nodeId, target: nn.next, weight: nn.weight, prereq: "random (" + (nn.weight || count) + ")"}, classes: "prereq"});
-	}
-}
-function AddNonrandomConditionals(elems, nodeId, nextdata) {
-	for(var i = 0; i < nextdata.length; i++) {
-		var nn = nextdata[i];
-		elems.edges.push({data: {source: nodeId, target: nn.next, prereq: nn.condition}, classes: "prereq"});
-	}
 }
