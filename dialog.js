@@ -60,6 +60,7 @@ function InitNodeOptions() {
 		$("#cy").addClass("selecting");
 		$("#notification").show();
 	});
+	$("#resetNext").on("click", function() { ResetNext(); });
 }
 function InitCytoscape(elems) {
 	var padding = 5;
@@ -258,11 +259,13 @@ function SetNextToSingle() {
 	$("#nextType").val("single");
 	$("#addButtons").hide();
 	$("#editSingleVal").show();
+	$("#resetNext").show();
 }
 function SetNextToOptions() {
 	$("#nextType").val("option");
 	$("#addButtons").hide();
 	$("#editOptionVals").show();
+	$("#resetNext").show();
 	CreateOptionForCurrentNode();
 	CreateOptionForCurrentNode();
 }
@@ -270,8 +273,24 @@ function SetNextToConditional() {
 	$("#nextType").val("conditional");
 	$("#addButtons").hide();
 	$("#editConditionalVals").show();
+	$("#resetNext").show();
 	CreateConditionForCurrentNode();
 	CreateConditionForCurrentNode();
+}
+function ResetNext() {
+	$("#resetNext").hide();
+	var cond = $("#nextType").val();
+	var nodeId = GetNodeID();
+	var node = cy.getElementById(nodeId);
+	if(cond == "option") {
+		cy.$("[id^='" + nodeId + "_']").remove();
+		cy.$("#CHOICE_" + nodeId).remove();
+	} else {
+		GetChildLinks(node).remove();
+	}
+	$(".nextOption").hide();
+	$("#addButtons").show();
+	$("#nextType").val("");
 }
 
 function CreateOptionForCurrentNode() { $("#addAdditionalOption").before(GetOptionChoice()); }
@@ -452,6 +471,7 @@ function EditNode(node) {
 	var children = GetChildLinks(node);
 	$(".nextOption").hide();
 	if(children.length > 1) {
+		$("#resetNext").show();
 		var isOption = cy.getElementById(children.first().data("target")).data("parent") !== undefined;
 		if(isOption) {
 			$("#editOptionVals").show();
@@ -489,11 +509,13 @@ function EditNode(node) {
 			if(allSameRandom) { $(".optionsCondition").val(""); }
 		}
 	} else if(children.length == 1) {
+		$("#resetNext").show();
 		$("#editSingleVal").show();
 		$("#nextType").val("single");
 		$("#editSingleVal").find(".optionsTarget").val(children.first().data("target"));
 	} else {
 		$("#addButtons").show();
+		$("#resetNext").hide();
 	}
 }
 function GetRegularNode(nodeId, nodeData) {

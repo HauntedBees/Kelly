@@ -64,3 +64,5 @@
 #addAdditionalOption { margin-bottom: 10px; }
 
 .close-group { margin-bottom: 0 !important; }
+
+#resetNext { display: none; }
