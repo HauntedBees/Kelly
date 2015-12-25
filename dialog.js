@@ -367,7 +367,7 @@ function SetNextToConditional() {
 	$("#editConditionalVals").show();
 	$("#resetNext").show();
 	$("#fullCondition").val("");
-	ToggleRandomCondition(false);
+	ToggleRandomCondition(true);
 	CreateConditionForCurrentNode();
 	CreateConditionForCurrentNode();
 }
