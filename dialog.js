@@ -61,6 +61,18 @@ function InitNodeOptions() {
 	});
 	$("#resetNext").on("click", function() { ResetNext(); });
 	$("#deleteNode").on("click", function() { DeleteNode(); });
+	$(".randomCondition").on("click", function() { ToggleRandomCondition($(this).hasClass("active")); });
+}
+function ToggleRandomCondition(turnOff) {
+	if(turnOff) {
+		$(".randomCondition").removeClass("active");
+		$(".conditionLabel").html("Condition");
+		$("#fullCondition").val("").removeAttr("disabled");
+	} else {
+		$(".randomCondition").addClass("active");
+		$(".conditionLabel").html("Weight");
+		$("#fullCondition").val("random").attr("disabled", "disabled");
+	}
 }
 function InitCytoscape(elems) {
 	var padding = 5;
@@ -354,6 +366,8 @@ function SetNextToConditional() {
 	$("#addButtons").hide();
 	$("#editConditionalVals").show();
 	$("#resetNext").show();
+	$("#fullCondition").val("");
+	ToggleRandomCondition(false);
 	CreateConditionForCurrentNode();
 	CreateConditionForCurrentNode();
 }
@@ -576,6 +590,7 @@ function EditNode(node) {
 			$("#nextType").val("conditional");
 			$("#fullCondition").val(node.data("condition"));
 			var allSameRandom = true, currRand = undefined;
+			ToggleRandomCondition($("#fullCondition").val() !== "random");
 			children.each(function() {
 				var nextId = this.data("target");
 				var nextNode = cy.getElementById(nextId);

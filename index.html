@@ -46,7 +46,7 @@
 				<input id="nextType" class="hiddenInfo" type="text">
 				<div class="form-group">
 					<label for="editID" class="col-sm-2 control-label">ID</label>
-					<div class="col-sm-10"><input id="editID" type="text" class="form-control saveable" placeholder="Required"></div>
+					<div class="col-sm-10"><input id="editID" type="text" class="form-control saveable" disabled="disabled"></div>
 				</div>
 				<div class="form-group">
 					<label for="editSpeaker" class="col-sm-2 control-label">Speaker</label>
@@ -143,12 +143,21 @@
 									</div>
 								</div>
 								<div class="form-group">
-									<label class="col-sm-4 control-label">Condition</label>
+									<label class="col-sm-4 control-label conditionLabel">Condition</label>
 									<div class="col-sm-8"><input type="text" class="form-control saveable optionsCondition" placeholder="None"></div>
 								</div>
 							</div>			
 							<div class="form-group">
-								<div class="col-sm-12"><input type="text" id="fullCondition" class="form-control saveable" placeholder="Optional Condition"></div>
+								<div class="col-sm-12">
+									<div class="input-group">
+										<input type="text" id="fullCondition" class="form-control saveable" placeholder="Optional Condition">
+										<span class="input-group-btn">
+											<button class="btn btn-default randomCondition" type="button">
+												<span>Random</span>
+											</button>
+										</span>
+									</div>
+								</div>
 							</div>
 							<button id="addAdditionalCondition" class="btn btn-default" type="button">Add More</button>
 						</span>
