@@ -269,7 +269,7 @@ function SaveJSON(returnString) {
 }
 function SaveXML() {
 	var nodes = SaveJSON(true);
-	var xml = "<nodes>";
+	var xml = "<!DOCTYPE nodes [<!ATTLIST node id ID #REQUIRED>]><nodes>";
 	nodes.forEach(function(node) { xml += NodeToXML(node); });
 	xml += "</nodes>";
 	var element = document.createElement("a");
