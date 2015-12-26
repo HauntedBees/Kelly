@@ -11,6 +11,7 @@ Each Dialogue Node _must_ contain an "id" element. In JSON, this is a property, 
 Dialogue Nodes will generally contain data. In JSON, this is a property object containing name value pairs. In XML, the Node Data will be children of the main node element. Node Data can contain the following elements:
 * **Speaker:** Name of whoever/whatever is saying the message. If empty, message can be a thought, action, or narration.
 * **Message:** The Dialogue message itself. If this and the speaker are both empty, this Dialogue Node will be a _no-op._
+* **Emotion:** Additional information about the message - can be used to determine which sprite to use for the speaker accompanying the text box, for example.
 * **Action:** An optional action that will be executed when this Dialogue Node is reached. Generally a script or function name.
 
 If this Dialogue Node has no Speaker and no Message, it will be a no-op. When a no-op is reached, the Node's action, if it exists, should be executed, then the Dialogue Chain should immediately move on to the next Node, with no display to the user.
@@ -39,6 +40,7 @@ The _next_ element contains two or more next nodes (stored in an array in JSON a
 			"data": {
 				"speaker": string,
 				"message": string,
+				"emotion": string,
 				"action": void_script
 			},
 			"next": id
@@ -147,6 +149,7 @@ The _next_ element contains two or more next nodes (stored in an array in JSON a
     <node id="singleNext">
         <speaker>string</speaker>
         <message>string</message>
+		<emotion>string</emotion>
         <action>void_script</action>
         <next>
             <node>id</node>

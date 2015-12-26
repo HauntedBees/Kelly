@@ -220,9 +220,10 @@ function SaveJSON(returnString) {
 		var data = {
 			id: this.data("id"),
 			data: {
-				speaker: this.data("speaker"), 
+				speaker: StringOrUndefined(this.data("speaker")), 
 				message: StringOrUndefined(this.data("rawmsg")), 
-				action: StringOrUndefined(this.data("action"))
+				action: StringOrUndefined(this.data("action")),
+				emotion: StringOrUndefined(this.data("emotion"))
 			}
 		};
 		var children = GetChildLinks(this);
@@ -298,6 +299,7 @@ function NodeToXML(node) {
 	var data = node.data;
 	if(data.speaker !== undefined) { xml += "<speaker>" + CleanXML(data.speaker) + "</speaker>"; }
 	if(data.message !== undefined) { xml += "<message>" + CleanXML(data.message) + "</message>"; }
+	if(data.emotion !== undefined) { xml += "<emotion>" + CleanXML(data.emotion) + "</emotion>"; }
 	if(data.action !== undefined) { xml += "<action>" + CleanXML(data.action) + "</action>"; }
 	if(node.next !== undefined) {
 		xml += "<next";
@@ -412,9 +414,10 @@ function SaveNode(nodeId) {
 	}
 	node.data("id", $("#editID").val());
 	node.data("speaker", $("#editSpeaker").val());
+	node.data("emotion", $("#editEmotion").val());
 	node.data("rawmsg", $("#editText").val());
 	node.data("action", $("#editAction").val());
-	var msg = GetMessage($("#editSpeaker").val(), $("#editText").val(), $("#editAction").val());
+	var msg = GetMessage($("#editSpeaker").val(), $("#editEmotion").val(), $("#editText").val(), $("#editAction").val());
 	if(msg === "") {
 		node.data("msg", "empty");
 		node.addClass("noop");
@@ -563,6 +566,7 @@ function EditNode(node) {
 	$("#oldID").val(node.data("id"));
 	$("#editID").val(node.data("id"));
 	$("#editSpeaker").val(node.data("speaker"));
+	$("#editEmotion").val(node.data("emotion"));
 	$("#editText").val(node.data("rawmsg"));
 	$("#editAction").val(node.data("action"));
 	$("#saveNode").removeAttr("disabled").html("Save");
@@ -621,17 +625,22 @@ function GetRegularNode(nodeId, nodeData) {
 	var res = {
 		data: {
 			id: nodeId, 
-			msg: GetMessage(nodeData.speaker, nodeData.message, nodeData.action),
+			msg: GetMessage(nodeData.speaker, nodeData.emotion, nodeData.message, nodeData.action),
 			rawmsg: nodeData.message,
 			speaker: nodeData.speaker,
+			emotion: nodeData.emotion, 
 			action: nodeData.action
 		}
 	};
 	return res;
 }
-function GetMessage(speaker, message, action) {
+function GetMessage(speaker, emotion, message, action) {
 	var res = message;
-	if(speaker !== undefined && speaker !== "") { res = speaker + ": " + res; }
+	if(speaker !== undefined && speaker !== "") {
+		var prefix = speaker;
+		if(emotion !== undefined && emotion !== "") { prefix += " (" + emotion + ")" }
+		res = prefix + ": " + res;
+	}
 	if(action !== undefined && action !== "") { res += "\n\n(" + action + ")"; }
 	return res;
 }
