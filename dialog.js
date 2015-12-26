@@ -184,6 +184,7 @@ function DisplayFromFile(data) { // data is JSON, ID cannot be a decimal number
 		elems.nodes.push(newNode);
 	});
 	InitCytoscape(elems);
+	if(cy.$("[id^='node']").length >= 0) { nodeCount = parseInt(cy.$("[id^='node']").last().data("id").replace("node", "")) + 1; }
 }
 function AddOptions(elems, nodeId, nextdata) {
 	var choiceid = "CHOICE_" + nodeId;
