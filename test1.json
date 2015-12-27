@@ -5,7 +5,8 @@
 			"data": {
 				"speaker": "Bob",
 				"message": "Hey kids",
-				"action": "x + 1"
+				"action": "x + 1",
+				"emotion": "casual"
 			},
 			"next": "I0002"
 		},
@@ -18,16 +19,16 @@
 				"type": "options",
 				"data": [
 					{
-						"option": "\"What's up, Bob?\"",
-						"next": "I0003"
-					},
-					{				
-						"option": "\"Fuck you, Bob.\"",
-						"next": "I0004"
+						"next": "I0003",
+						"option": "\"What's up, Bob?\""
 					},
 					{
-						"option": "Drool on the carpet.",
+						"next": "I0004",
+						"option": "\"Shut up, Bob.\""
+					},
+					{
 						"next": "I0006",
+						"option": "Drool on the carpet.",
 						"prereq": "INT < 5"
 					}
 				]
@@ -37,7 +38,7 @@
 			"id": "I0003",
 			"data": {
 				"speaker": "Bob",
-				"message": "Oh, it's just you, %PLAYERNAME%. I got some biggu news."
+				"message": "Oh, it's just you, %PLAYERNAME%. I got some big news."
 			},
 			"next": "I0005"
 		},
@@ -45,7 +46,8 @@
 			"id": "I0004",
 			"data": {
 				"speaker": "Bob",
-				"message": "Wow you're kind of an asshole. But anyway, I have some news."
+				"message": "Wow you're kind of a jerk. But anyway, I have some news.",
+				"emotion": "annoyed"
 			},
 			"next": "I0005"
 		},
@@ -53,18 +55,18 @@
 			"id": "I0005",
 			"data": {
 				"speaker": "Bob",
-				"message": "But I'll tell you later. I need to smok wheed naow."
+				"message": "But I'll tell you later. I need to play video games now."
 			},
 			"next": {
 				"type": "conditional",
 				"data": [
 					{
-						"condition": "IsNightTime()",
-						"next": "I0007"
+						"next": "I0007",
+						"condition": "IsNightTime()"
 					},
 					{
-						"condition": "else",
-						"next": "I0008"
+						"next": "I0008",
+						"condition": "else"
 					}
 				]
 			}
@@ -85,15 +87,19 @@
 		{
 			"id": "I0008",
 			"data": {
-				"message": "You sigh. Bob is a shithead."
-			}, 
+				"message": "You sigh. Bob is a jerk."
+			},
 			"next": {
 				"type": "conditional",
-				"condition": "random",
 				"data": [
-					{"next": "I0009"}, 
-					{"next": "I0010"}
-				]
+					{
+						"next": "I0009"
+					},
+					{
+						"next": "I0010"
+					}
+				],
+				"condition": "random"
 			}
 		},
 		{
@@ -106,20 +112,20 @@
 			"id": "I0010",
 			"data": {
 				"message": "You're glad he's not dead."
-			}, 
+			},
 			"next": {
 				"type": "conditional",
-				"condition": "random",
 				"data": [
 					{
 						"next": "I0011",
-						"weight": 0.6
-					}, 
+						"weight": "0.6"
+					},
 					{
 						"next": "I0012",
-						"weight": 0.4
+						"weight": "0.4"
 					}
-				]
+				],
+				"condition": "random"
 			}
 		},
 		{
@@ -131,7 +137,7 @@
 		{
 			"id": "I0012",
 			"data": {
-				"message": "But you do wish he'd shut the hell up."
+				"message": "But you do wish he'd shut up."
 			}
 		}
 	]
