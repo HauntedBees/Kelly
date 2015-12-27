@@ -635,7 +635,7 @@ function GetRegularNode(nodeId, nodeData) {
 	return res;
 }
 function GetMessage(speaker, emotion, message, action) {
-	var res = message;
+	var res = (message === undefined ? "" : message);
 	if(speaker !== undefined && speaker !== "") {
 		var prefix = speaker;
 		if(emotion !== undefined && emotion !== "") { prefix += " (" + emotion + ")" }
