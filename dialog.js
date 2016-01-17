@@ -352,6 +352,7 @@ function CleanUpMenu() {
 }
 function SetNextToSingle() {
 	$("#nextType").val("single");
+	$("#singleTarget").val("*new*");
 	$("#addButtons").hide();
 	$("#editSingleVal").show();
 	$("#resetNext").show();
