@@ -1,8 +1,8 @@
-# Kevin
+# Kelly
 ## wut
-Kevin is a browser-based dialogue tree editor. It is made to be general enough to work with a wide variety of games.
+Kelly is a browser-based dialogue tree editor. It is made to be general enough to work with a wide variety of games.
 ## license
-Kevin is GPLv3 because yes.
+Kelly is GPLv3 because yes.
 ## why
 because i'll need it eventually.
 ## also
