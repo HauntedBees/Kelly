@@ -6,6 +6,6 @@ Kelly is GPLv3 because yes.
 ## why
 because i'll need it eventually.
 ## also
-Kevin uses jquery, bootstrap, and cytoscape.js, which can be found through Google.
+Kelly uses jquery, bootstrap, and cytoscape.js, which can be found through Google.
 ## want to make changes?
 sure make a pull or whatever.
