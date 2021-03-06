@@ -1,7 +1,7 @@
-# Kevin Dialogue Node Set Format
+# Kelly Dialogue Node Set Format
 
 ## Main Container
-There is one outer element for any Kevin JSON or XML file, "nodes". In JSON, "nodes" is an array of Dialogue Nodes, and in XML, "nodes" is an element whose children are all Dialogue Nodes.
+There is one outer element for any Kelly JSON or XML file, "nodes". In JSON, "nodes" is an array of Dialogue Nodes, and in XML, "nodes" is an element whose children are all Dialogue Nodes.
 ## Dialogue Nodes
 ### Node ID
 Each Dialogue Node _must_ contain an "id" element. In JSON, this is a property, and in XML, this is an attribute in the node element.
